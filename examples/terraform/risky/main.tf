@@ -81,7 +81,7 @@ resource "google_sql_database_instance" "orders" {
 }
 
 resource "google_service_account" "app" {
-  account_id = "app"
+  account_id = "app-service"
 }
 
 resource "google_service_account_key" "app" {

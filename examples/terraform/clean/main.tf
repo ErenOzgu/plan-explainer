@@ -51,7 +51,7 @@ resource "google_storage_bucket" "reports" {
 }
 
 resource "google_service_account" "worker" {
-  account_id = "worker"
+  account_id = "worker-sa"
 }
 
 resource "google_compute_instance" "worker" {
