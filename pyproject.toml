@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "plan-explainer"
+version = "0.1.0"
+description = "Reads terraform show -json and says what a plan will do and what to look at: rule-based findings first, an optional model-written summary that is checked against them."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "Eren Özgü" }]
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "ruff>=0.6", "pyyaml>=6"]
+
+[project.scripts]
+plan-explainer = "plan_explainer.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["plan_explainer*"]
+
+[tool.ruff]
+line-length = 110
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff.lint.per-file-ignores]
+"plan_explainer/rules.py" = ["E501"]  # messages shown to people are kept in one piece
+"plan_explainer/report.py" = ["E501"]
+"plan_explainer/cli.py" = ["E501"]
+"plan_explainer/llm.py" = ["E501"]
+"tests/*" = ["E501"]

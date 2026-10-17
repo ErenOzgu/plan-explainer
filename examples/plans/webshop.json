@@ -1,0 +1,434 @@
+{
+  "format_version": "1.2",
+  "terraform_version": "1.9.8",
+  "planned_values": {
+    "root_module": {}
+  },
+  "resource_changes": [
+    {
+      "address": "google_compute_address.app_ip",
+      "mode": "managed",
+      "type": "google_compute_address",
+      "name": "app_ip",
+      "provider_name": "registry.terraform.io/hashicorp/google",
+      "change": {
+        "actions": [
+          "delete"
+        ],
+        "before": {
+          "name": "app-ip",
+          "address": "34.89.0.10",
+          "region": "europe-west3"
+        },
+        "after": null,
+        "after_unknown": {},
+        "before_sensitive": false,
+        "after_sensitive": {}
+      },
+      "action_reason": "delete_because_no_resource_config"
+    },
+    {
+      "address": "google_compute_disk.old_data",
+      "mode": "managed",
+      "type": "google_compute_disk",
+      "name": "old_data",
+      "provider_name": "registry.terraform.io/hashicorp/google",
+      "change": {
+        "actions": [
+          "delete"
+        ],
+        "before": {
+          "name": "old-data",
+          "size": 500,
+          "type": "pd-ssd",
+          "zone": "europe-west3-b"
+        },
+        "after": null,
+        "after_unknown": {},
+        "before_sensitive": false,
+        "after_sensitive": {}
+      },
+      "action_reason": "delete_because_no_resource_config"
+    },
+    {
+      "address": "google_compute_firewall.debug_ssh",
+      "mode": "managed",
+      "type": "google_compute_firewall",
+      "name": "debug_ssh",
+      "provider_name": "registry.terraform.io/hashicorp/google",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "name": "debug-ssh",
+          "network": "default",
+          "direction": "INGRESS",
+          "source_ranges": [
+            "0.0.0.0/0"
+          ],
+          "allow": [
+            {
+              "protocol": "tcp",
+              "ports": [
+                "22"
+              ]
+            }
+          ]
+        },
+        "after_unknown": {},
+        "before_sensitive": false,
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "google_compute_firewall.web",
+      "mode": "managed",
+      "type": "google_compute_firewall",
+      "name": "web",
+      "provider_name": "registry.terraform.io/hashicorp/google",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "name": "web",
+          "network": "default",
+          "direction": "INGRESS",
+          "source_ranges": [
+            "0.0.0.0/0"
+          ],
+          "allow": [
+            {
+              "protocol": "tcp",
+              "ports": [
+                "80",
+                "443"
+              ]
+            }
+          ]
+        },
+        "after_unknown": {},
+        "before_sensitive": false,
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "google_compute_instance.app",
+      "mode": "managed",
+      "type": "google_compute_instance",
+      "name": "app",
+      "provider_name": "registry.terraform.io/hashicorp/google",
+      "change": {
+        "actions": [
+          "update"
+        ],
+        "before": {
+          "name": "app-1",
+          "machine_type": "e2-small",
+          "zone": "europe-west3-b",
+          "network_interface": [
+            {
+              "network": "default",
+              "access_config": [
+                {
+                  "nat_ip": "34.89.0.10"
+                }
+              ]
+            }
+          ],
+          "service_account": [
+            {
+              "email": "app@shop-prod.iam.gserviceaccount.com",
+              "scopes": [
+                "https://www.googleapis.com/auth/cloud-platform"
+              ]
+            }
+          ]
+        },
+        "after": {
+          "name": "app-1",
+          "machine_type": "e2-medium",
+          "zone": "europe-west3-b",
+          "network_interface": [
+            {
+              "network": "default",
+              "access_config": [
+                {
+                  "nat_ip": "34.89.0.10"
+                }
+              ]
+            }
+          ],
+          "service_account": [
+            {
+              "email": "app@shop-prod.iam.gserviceaccount.com",
+              "scopes": [
+                "https://www.googleapis.com/auth/cloud-platform"
+              ]
+            }
+          ]
+        },
+        "after_unknown": {},
+        "before_sensitive": false,
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "google_dns_record_set.www",
+      "mode": "managed",
+      "type": "google_dns_record_set",
+      "name": "www",
+      "provider_name": "registry.terraform.io/hashicorp/google",
+      "change": {
+        "actions": [
+          "update"
+        ],
+        "before": {
+          "name": "www.shop.example.",
+          "type": "A",
+          "ttl": 300,
+          "rrdatas": [
+            "34.89.0.10"
+          ]
+        },
+        "after": {
+          "name": "www.shop.example.",
+          "type": "A",
+          "ttl": 300,
+          "rrdatas": [
+            "34.89.0.20"
+          ]
+        },
+        "after_unknown": {},
+        "before_sensitive": false,
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "google_logging_project_sink.audit",
+      "mode": "managed",
+      "type": "google_logging_project_sink",
+      "name": "audit",
+      "provider_name": "registry.terraform.io/hashicorp/google",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "name": "audit",
+          "destination": "storage.googleapis.com/shop-audit-logs",
+          "filter": "logName:cloudaudit.googleapis.com"
+        },
+        "after_unknown": {},
+        "before_sensitive": false,
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "google_project_iam_member.ci_deployer",
+      "mode": "managed",
+      "type": "google_project_iam_member",
+      "name": "ci_deployer",
+      "provider_name": "registry.terraform.io/hashicorp/google",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "project": "shop-prod",
+          "role": "roles/owner",
+          "member": "serviceAccount:ci-deployer@shop-prod.iam.gserviceaccount.com"
+        },
+        "after_unknown": {},
+        "before_sensitive": false,
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "google_secret_manager_secret_version.db_password",
+      "mode": "managed",
+      "type": "google_secret_manager_secret_version",
+      "name": "db_password",
+      "provider_name": "registry.terraform.io/hashicorp/google",
+      "change": {
+        "actions": [
+          "update"
+        ],
+        "before": {
+          "secret": "projects/1/secrets/db",
+          "secret_data": "old-value",
+          "enabled": true
+        },
+        "after": {
+          "secret": "projects/1/secrets/db",
+          "secret_data": "new-value",
+          "enabled": true
+        },
+        "after_unknown": {},
+        "before_sensitive": {
+          "secret_data": true
+        },
+        "after_sensitive": {
+          "secret_data": true
+        }
+      }
+    },
+    {
+      "address": "google_service_account_key.ci_deployer",
+      "mode": "managed",
+      "type": "google_service_account_key",
+      "name": "ci_deployer",
+      "provider_name": "registry.terraform.io/hashicorp/google",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "service_account_id": "ci-deployer"
+        },
+        "after_unknown": {
+          "private_key": true,
+          "id": true
+        },
+        "before_sensitive": false,
+        "after_sensitive": {
+          "private_key": true
+        }
+      }
+    },
+    {
+      "address": "google_sql_database_instance.orders",
+      "mode": "managed",
+      "type": "google_sql_database_instance",
+      "name": "orders",
+      "provider_name": "registry.terraform.io/hashicorp/google",
+      "change": {
+        "actions": [
+          "delete",
+          "create"
+        ],
+        "before": {
+          "name": "orders",
+          "database_version": "POSTGRES_15",
+          "region": "europe-west1",
+          "deletion_protection": false,
+          "settings": [
+            {
+              "tier": "db-custom-2-7680",
+              "backup_configuration": [
+                {
+                  "enabled": true
+                }
+              ],
+              "ip_configuration": [
+                {
+                  "ipv4_enabled": false,
+                  "authorized_networks": []
+                }
+              ]
+            }
+          ]
+        },
+        "after": {
+          "name": "orders",
+          "database_version": "POSTGRES_15",
+          "region": "europe-west3",
+          "deletion_protection": false,
+          "settings": [
+            {
+              "tier": "db-custom-2-7680",
+              "backup_configuration": [
+                {
+                  "enabled": false
+                }
+              ],
+              "ip_configuration": [
+                {
+                  "ipv4_enabled": false,
+                  "authorized_networks": []
+                }
+              ]
+            }
+          ]
+        },
+        "after_unknown": {
+          "id": true,
+          "connection_name": true
+        },
+        "before_sensitive": false,
+        "after_sensitive": {},
+        "replace_paths": [
+          [
+            "region"
+          ]
+        ]
+      },
+      "action_reason": "replace_because_cannot_update"
+    },
+    {
+      "address": "google_storage_bucket.uploads",
+      "mode": "managed",
+      "type": "google_storage_bucket",
+      "name": "uploads",
+      "provider_name": "registry.terraform.io/hashicorp/google",
+      "change": {
+        "actions": [
+          "update"
+        ],
+        "before": {
+          "name": "shop-uploads",
+          "location": "EU",
+          "uniform_bucket_level_access": true,
+          "versioning": [
+            {
+              "enabled": true
+            }
+          ]
+        },
+        "after": {
+          "name": "shop-uploads",
+          "location": "EU",
+          "uniform_bucket_level_access": false,
+          "versioning": [
+            {
+              "enabled": false
+            }
+          ]
+        },
+        "after_unknown": {},
+        "before_sensitive": false,
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "google_storage_bucket_iam_member.assets_public",
+      "mode": "managed",
+      "type": "google_storage_bucket_iam_member",
+      "name": "assets_public",
+      "provider_name": "registry.terraform.io/hashicorp/google",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "bucket": "shop-assets",
+          "role": "roles/storage.objectViewer",
+          "member": "allUsers"
+        },
+        "after_unknown": {},
+        "before_sensitive": false,
+        "after_sensitive": {}
+      }
+    }
+  ],
+  "output_changes": {},
+  "configuration": {},
+  "errored": false
+}

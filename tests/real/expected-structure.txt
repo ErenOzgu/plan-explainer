@@ -1,0 +1,2 @@
+data-loss terraform_data.cbd
+data-loss terraform_data.keyed["b"]

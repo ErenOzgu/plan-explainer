@@ -1,0 +1,140 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install ruff
+      - run: ruff check .
+      - run: ruff format --check .
+      - name: shellcheck
+        run: shellcheck -S style tests/real/record.sh
+      - name: actionlint
+        run: |
+          set -euo pipefail
+          v=1.7.7
+          base="https://github.com/rhysd/actionlint/releases/download/v${v}"
+          curl -fsSL -o "actionlint.tgz" "${base}/actionlint_${v}_linux_amd64.tar.gz"
+          curl -fsSL -o "checksums.txt" "${base}/actionlint_${v}_checksums.txt"
+          grep " actionlint_${v}_linux_amd64.tar.gz\$" checksums.txt | sed 's/ actionlint_.*/ actionlint.tgz/' | sha256sum -c -
+          tar -xzf actionlint.tgz actionlint
+          ./actionlint
+
+  test:
+    name: Tests (Python ${{ matrix.python }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - run: pip install -e '.[dev]'
+      - run: python -m pytest -q
+
+  examples:
+    name: The examples are reproducible
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e .
+      - name: The example plans are what the generator writes
+        run: |
+          python examples/make_plans.py
+          git diff --exit-code -- examples/plans
+      - name: The committed reports are what the tool writes today
+        run: |
+          set -euo pipefail
+          for p in webshop tidy; do
+            plan-explainer explain "examples/plans/$p.json" -f md | diff - "examples/reports/$p.md"
+          done
+          plan-explainer explain examples/plans/webshop.json -f text | diff - examples/reports/webshop.txt
+      - name: The gate fails on the risky plan (exit 3) and passes the tidy one
+        run: |
+          rc=0
+          plan-explainer explain examples/plans/webshop.json --fail-on high > /dev/null || rc=$?
+          test "$rc" -eq 3
+          plan-explainer explain examples/plans/tidy.json --fail-on low > /dev/null
+
+  terraform:
+    name: Real Terraform plans
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e .
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.9.8"
+          terraform_wrapper: false
+
+      - name: Plans with every kind of action (built-in terraform_data, no provider, no credentials)
+        run: |
+          set -euo pipefail
+          for s in lifecycle structure; do
+            tests/real/record.sh "$s" "$RUNNER_TEMP/$s"
+            python tests/real/shape.py "$RUNNER_TEMP/$s/plan.json" "tests/real/$s.json"
+          done
+      - name: The data-loss rule on a real replace and a real destroy
+        run: |
+          set -euo pipefail
+          plan-explainer explain "$RUNNER_TEMP/structure/plan.json" -c tests/real/stateful.toml -f json \
+            | python tests/real/findings.py | diff - tests/real/expected-structure.txt
+
+      - name: Google Cloud plans with the real provider (dummy token, nothing is created)
+        env:
+          GOOGLE_OAUTH_ACCESS_TOKEN: plan-only-token
+        run: |
+          set -euo pipefail
+          for dir in risky clean; do
+            d="examples/terraform/$dir"
+            terraform -chdir="$d" init -backend=false -input=false -no-color > /dev/null
+            terraform -chdir="$d" plan -input=false -lock=false -no-color -out="$RUNNER_TEMP/$dir.tfplan" > /dev/null
+            terraform -chdir="$d" show -json "$RUNNER_TEMP/$dir.tfplan" > "$RUNNER_TEMP/$dir.json"
+          done
+      - name: The findings on the risky configuration are exactly the expected ones
+        run: |
+          set -euo pipefail
+          plan-explainer explain "$RUNNER_TEMP/risky.json" -f json | python tests/real/findings.py \
+            | diff - examples/terraform/risky/expected.txt
+      - name: The clean configuration has none and passes the strictest gate
+        run: plan-explainer explain "$RUNNER_TEMP/clean.json" --fail-on low
+      - name: The gate fails on the risky configuration
+        run: |
+          rc=0
+          plan-explainer explain "$RUNNER_TEMP/risky.json" --fail-on high > /dev/null || rc=$?
+          test "$rc" -eq 3
+      - name: Report in the job summary, findings as annotations
+        run: plan-explainer explain "$RUNNER_TEMP/risky.json" -f md -o "$RUNNER_TEMP/risky.md" --github-summary --annotate
+      - uses: actions/upload-artifact@v4
+        with:
+          name: real-plans
+          path: |
+            ${{ runner.temp }}/risky.json
+            ${{ runner.temp }}/risky.md
+            ${{ runner.temp }}/clean.json

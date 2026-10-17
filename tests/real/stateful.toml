@@ -1,0 +1,2 @@
+# terraform_data holds nothing; pretending it does lets a real plan exercise the data-loss rule.
+stateful_types = ["terraform_data"]

@@ -1,0 +1,100 @@
+{
+  "format_version": "1.2",
+  "terraform_version": "1.9.8",
+  "planned_values": {
+    "root_module": {}
+  },
+  "resource_changes": [
+    {
+      "address": "google_compute_firewall.web",
+      "mode": "managed",
+      "type": "google_compute_firewall",
+      "name": "web",
+      "provider_name": "registry.terraform.io/hashicorp/google",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "name": "web",
+          "network": "default",
+          "direction": "INGRESS",
+          "source_ranges": [
+            "0.0.0.0/0"
+          ],
+          "allow": [
+            {
+              "protocol": "tcp",
+              "ports": [
+                "443"
+              ]
+            }
+          ]
+        },
+        "after_unknown": {},
+        "before_sensitive": false,
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "google_compute_instance.worker",
+      "mode": "managed",
+      "type": "google_compute_instance",
+      "name": "worker",
+      "provider_name": "registry.terraform.io/hashicorp/google",
+      "change": {
+        "actions": [
+          "update"
+        ],
+        "before": {
+          "name": "worker",
+          "labels": {
+            "team": "shop"
+          },
+          "machine_type": "e2-small"
+        },
+        "after": {
+          "name": "worker",
+          "labels": {
+            "team": "shop",
+            "env": "prod"
+          },
+          "machine_type": "e2-small"
+        },
+        "after_unknown": {},
+        "before_sensitive": false,
+        "after_sensitive": {}
+      }
+    },
+    {
+      "address": "google_storage_bucket.reports",
+      "mode": "managed",
+      "type": "google_storage_bucket",
+      "name": "reports",
+      "provider_name": "registry.terraform.io/hashicorp/google",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "name": "shop-reports",
+          "location": "EU",
+          "uniform_bucket_level_access": true,
+          "versioning": [
+            {
+              "enabled": true
+            }
+          ]
+        },
+        "after_unknown": {},
+        "before_sensitive": false,
+        "after_sensitive": {}
+      }
+    }
+  ],
+  "output_changes": {},
+  "configuration": {},
+  "errored": false
+}
